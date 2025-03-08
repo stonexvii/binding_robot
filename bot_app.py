@@ -8,7 +8,6 @@ from handlers import all_handlers
 from misc import *
 
 
-
 async def start_bot():
     bot = Bot(token=os.getenv('BOT_TOKEN'))
     dp = Dispatcher()

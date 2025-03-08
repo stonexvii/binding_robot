@@ -13,15 +13,11 @@ group_handler = Router()
     EntityFilter(MessageEntityType.HASHTAG),
     ChatTypeFilter([ChatType.GROUP, ChatType.SUPERGROUP]))
 async def forward_group_message(message: Message, entities: list[str], bot: Bot):
-    user_id = message.from_user.id
-    hashtags = entities
-    channel_id = message.forward_origin.chat.id
-    group_id = message.chat.id
-    message_thread_id = message.message_thread_id
-    link = Link(user_id, hashtags, channel_id, group_id, message_thread_id)
-    reports = await link.create_link()
-    for report in reports:
+    for hashtag in entities:
+        link = Link.from_message(message, hashtag)
+        await link.load_names(bot)
+        report = await link.create_link()
         await bot.send_message(
-            chat_id=user_id,
-            text=f'Link c {report} добавлен!',
+            chat_id=message.from_user.id,
+            text=report,
         )
