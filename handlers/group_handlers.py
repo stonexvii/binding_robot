@@ -2,7 +2,7 @@ from aiogram import Bot, Router, F
 from aiogram.types import Message
 from aiogram.enums import ChatType, MessageEntityType
 
-from filters import EntityFilter, ChatTypeFilter
+from filters import EntityTextFilter, ChatTypeFilter
 from classes import Link
 
 group_handler = Router()
@@ -10,7 +10,7 @@ group_handler = Router()
 
 @group_handler.message(
     F.forward_origin,
-    EntityFilter(MessageEntityType.HASHTAG),
+    EntityTextFilter(MessageEntityType.HASHTAG),
     ChatTypeFilter([ChatType.GROUP, ChatType.SUPERGROUP]))
 async def forward_group_message(message: Message, entities: list[str], bot: Bot):
     for hashtag in entities:
