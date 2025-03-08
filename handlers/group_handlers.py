@@ -14,7 +14,7 @@ group_handler = Router()
     ChatTypeFilter([ChatType.GROUP, ChatType.SUPERGROUP]))
 async def forward_group_message(message: Message, entities: list[str], bot: Bot):
     for hashtag in entities:
-        link = Link(message, hashtag)
+        link = Link.from_message(message, hashtag)
         await link.load_names(bot)
         report = await link.create_link()
         await bot.send_message(

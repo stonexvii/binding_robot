@@ -11,7 +11,6 @@ def ikb_select_hashtag(button_list: set[str]):
         keyboard.button(
             text=button,
             callback_data=HashtagData(
-                button='select_hashtag',
                 hashtag=button,
             ),
         )
@@ -32,7 +31,9 @@ def ikb_select_link(link_list: list[Link]):
         )
     keyboard.button(
         text='Назад',
-        callback_data='0',
+        callback_data=HashtagData(
+            hashtag='back_button',
+        ),
     )
     keyboard.adjust(*[1] * len(link_list), 1)
     return keyboard.as_markup()
