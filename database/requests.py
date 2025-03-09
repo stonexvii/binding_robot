@@ -24,21 +24,23 @@ from .models import LinkTable
 
 @connection
 async def get_user(user_id: int, session: AsyncSession):
-    result = await session.scalars(select(LinkTable).where(LinkTable.user_id == user_id))
-    return result.all()
+    response = await session.scalars(select(LinkTable).where(LinkTable.user_id == user_id))
+    return response.all()
 
 
 @connection
 async def get_hashtag(user_id: int, hashtag: str, session: AsyncSession):
-    result = await session.scalars(select(LinkTable).where(LinkTable.user_id == user_id, LinkTable.hashtag == hashtag))
-    return result.all()
+    response = await session.scalars(
+        select(LinkTable).where(LinkTable.user_id == user_id, LinkTable.hashtag == hashtag))
+    return response.all()
 
-# @connection
-# async def get_channel_hashtags(channel_id: int, session: AsyncSession):
-#     result = await session.scalars(select(LinkTable).where(LinkTable.channel_id == channel_id))
-#     return result.all()
-#
-#
+
+@connection
+async def get_channel_hashtags(channel_id: int, session: AsyncSession):
+    response = await session.scalars(select(LinkTable).where(LinkTable.channel_id == channel_id))
+    return response.all()
+
+
 # @connection
 # async def get_links_by_hashtag(hashtag: str, session: AsyncSession):
 #     result = await session.scalars(select(LinkTable).where(LinkTable.hashtag == hashtag))
@@ -68,25 +70,40 @@ async def get_hashtag(user_id: int, hashtag: str, session: AsyncSession):
 # #             await session.delete(link)
 # #     await session.commit()
 #
-# @connection
-# async def unlink_group(group_id: int, thread_id: int, session: AsyncSession):
-#     query = await session.execute(select(LinkTable).where(
-#         LinkTable.group_id == group_id,
-#         LinkTable.thread_id == thread_id,
-#     ))
-#     links = query.scalars().all()
-#     for link in links:
-#         await session.delete(link)
-#     await session.commit()
-#
-#
-# @connection
-# async def unlink_hashtag(group_id: int, thread_id: int, hashtag: str, session: AsyncSession):
-#     query = await session.execute(select(LinkTable).where(
-#         LinkTable.group_id == group_id,
-#         LinkTable.hashtag == hashtag,
-#         LinkTable.thread_id == thread_id,
-#     ))
-#     link = query.scalar()
-#     await session.delete(link)
-#     await session.commit()
+
+@connection
+async def get_channel_hashtags(channel_id: int, session: AsyncSession):
+    response = await session.scalars(select(LinkTable).where(LinkTable.channel_id == channel_id))
+    return response.all()
+
+
+@connection
+async def unlink_group(group_id: int, thread_id: int, session: AsyncSession):
+    response = await session.scalars(select(LinkTable).where(
+        LinkTable.group_id == group_id,
+        LinkTable.thread_id == thread_id,
+    ))
+    for link in response.all():
+        await session.delete(link)
+    await session.commit()
+
+
+@connection
+async def unlink_group(group_id: int, thread_id: int, hashtag: str, session: AsyncSession):
+    response = await session.scalar(select(LinkTable).where(
+        LinkTable.group_id == group_id,
+        LinkTable.hashtag == hashtag,
+        LinkTable.thread_id == thread_id,
+    ))
+    await session.delete(response)
+    await session.commit()
+
+
+@connection
+async def unlink_channel(channel_id: int, hashtag: str, session: AsyncSession):
+    response = await session.scalar(select(LinkTable).where(
+        LinkTable.channel_id == channel_id,
+        LinkTable.hashtag == hashtag,
+    ))
+    await session.delete(response)
+    await session.commit()
