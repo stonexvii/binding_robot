@@ -8,8 +8,8 @@ from filters import EntityTextFilter, EntityCaptionFilter
 channel_handler = Router()
 
 
-@channel_handler.channel_post(EntityCaptionFilter(MessageEntityType.HASHTAG))
 @channel_handler.channel_post(EntityTextFilter(MessageEntityType.HASHTAG))
+@channel_handler.channel_post(EntityCaptionFilter(MessageEntityType.HASHTAG))
 async def channel_post_hashtag(message: Message, entities: list[str], bot: Bot):
     links = await get_channel_hashtags(message.chat.id)
     for link in links:

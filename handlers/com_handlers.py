@@ -3,8 +3,8 @@ from aiogram.types import Message
 from aiogram.filters import Command, CommandObject
 from aiogram.enums import ChatType
 
-from classes import Group, User
-from database.requests import unlink_hashtag, unlink_group
+from classes import Link, User
+from database.requests import get_group_links
 from filters import ChatTypeFilter
 from keyboards import ikb_select_hashtag
 
@@ -24,23 +24,25 @@ async def com_start(message: Message, bot: Bot):
 
 @com_handler.message(Command('unlink'), ChatTypeFilter([ChatType.GROUP, ChatType.SUPERGROUP]))
 async def com_unlink(message: Message, command: CommandObject, bot: Bot):
-    user = User(message.from_user.id, bot)
-    links = await user.links
+    user_id = message.from_user.id
     group_id = message.chat.id
     thread_id = message.message_thread_id
     hashtags = command.args.split() if command.args else None
-    if hashtags:
-        for hashtag in set(links).intersection(hashtags):
-            for link in links[hashtag]:
-                if link.group.id == group_id and link.group.thread_id == thread_id:
-                    await link.unlink_group()
-    else:
+    response = await get_group_links(user_id, group_id, thread_id)
+    if response:
+        links = [Link(entry.hashtag, entry.channel_id, entry.group_id, entry.thread_id) for entry in response]
+        for link in links:
+            await link.load_names(bot)
+            if hashtags and link.hashtag in hashtags:
+                await link.unlink()
+                await bot.send_message(
+                    chat_id=user_id,
+                    text=link.unlink_text,
+                )
+            else:
+                await link.unlink()
+                await bot.send_message(
+                    chat_id=user_id,
+                    text=link.unlink_text,
+                )
 
-        for hashtag in hashtags:
-            await unlink_hashtag(group_id, thread_id, hashtag)
-            await bot.send_message(
-                chat_id=message.from_user.id,
-                text=
-            )
-    else:
-        await unlink_group(group_id, thread_id)

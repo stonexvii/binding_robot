@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import LinkTable
 from database.database import async_session, connection
-from database.requests import get_user, get_hashtag, unlink_channel, unlink_group
+from database.requests import get_user, get_hashtag, new_link, unlink
 
 
 class Chat:
@@ -116,8 +116,12 @@ class Link:
     def button_text(self) -> str:
         return f'{self.channel.name} ▶ {self.group.name} ({self.group.thread_id})'
 
-    async def unlink_group(self):
-        await unlink_group(self.group.id, self.group.thread_id, self.hashtag)
+    async def unlink(self):
+        await unlink(self.channel.id, self.group.id, self.group.thread_id, self.hashtag)
+
+    @property
+    def unlink_text(self) -> str:
+        return f'Связь {self.button_text} удалена!'
 
 
 class HashTag:
@@ -136,6 +140,10 @@ class User:
     def __init__(self, user_tg_id: int, bot: Bot):
         self.id = user_tg_id
         self.bot = bot
+
+    async def create_link(self, hashtag: str, channel_id: int, group_id: int, thread_id: int):
+        response = await new_link(self.id, hashtag, channel_id, group_id, thread_id)
+        return response
 
     @property
     async def hashtags(self) -> list[HashTag]:
