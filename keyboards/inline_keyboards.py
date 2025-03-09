@@ -2,16 +2,16 @@ from aiogram import Bot
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from .callback_data import HashtagData, LinkData
-from classes import Link
+from classes import HashTag, Link
 
 
-def ikb_select_hashtag(button_list: set[str]):
+def ikb_select_hashtag(user_hashtags: list[HashTag]):
     keyboard = InlineKeyboardBuilder()
-    for button in button_list:
+    for hashtag in user_hashtags:
         keyboard.button(
-            text=button,
+            text=hashtag.hashtag,
             callback_data=HashtagData(
-                hashtag=button,
+                hashtag=hashtag.hashtag,
             ),
         )
     return keyboard.as_markup()
@@ -21,7 +21,7 @@ def ikb_select_link(link_list: list[Link]):
     keyboard = InlineKeyboardBuilder()
     for link in link_list:
         keyboard.button(
-            text=link.for_button(),
+            text=link.button_text,
             callback_data=LinkData(
                 hashtag=link.hashtag,
                 channel_id=link.channel.id,

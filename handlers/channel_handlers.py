@@ -2,7 +2,7 @@ from aiogram import Bot, Router, F
 from aiogram.types import Message
 from aiogram.enums import MessageEntityType
 
-from database.requests import get_channel_hashtags
+# from database.requests import get_channel_hashtags
 from filters import EntityTextFilter, EntityCaptionFilter
 
 channel_handler = Router()
